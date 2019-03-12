@@ -49,6 +49,8 @@ intent to monitor is 3:
  <li> 4 USB to micro USB cables.
  <li> 1 Double-Side Prototype PCB Printed Circuit Board. For example: 
  https://www.amazon.com/Penta-Angel-Double-Side-Prototype-Universal/dp/B012YZ2Q4G
+ <li> 1 Electronic enclosure / project junction box. For example: 
+ https://www.amazon.com/Electronic-Enclosures-Enclosure-Corrosion-Preventive/dp/B07C3W77GF
 </ul>
 
 ## Assembling the Powermeter
