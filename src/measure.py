@@ -58,7 +58,7 @@ def measure(interval, out_file):
     adc_in.set_conversion_mode(1)
     adc_in.set_pga(1)
 
-    out = file(out_file, 'w')
+    out = open(out_file, 'w')
     out.write("timestamp " + (len(_machines) * "%s " % tuple(_machines)) + "\n")
     try:
         while True:
