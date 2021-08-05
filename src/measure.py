@@ -12,6 +12,7 @@ from __future__ import absolute_import, unicode_literals
 from argparse import ArgumentParser
 import time
 import signal
+import sys
 
 _r = [0.1, 0.1, 0.1]   # Values of the shunt resistors
 _machines = ["pi-1", "pi-2", "pi-3"]
