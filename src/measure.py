@@ -1,42 +1,50 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 ================================================
-Script that measures the voltage of an ADC and
-a differential ADC anc computes the amount of
-power drawn by four USB ports
+Script that measures the voltage of an ADC and a differential ADC
+and computes the amount of power drawn by 5V lines
 ================================================
 Author: Marcos Dias de Assuncao
 """
 
 from __future__ import absolute_import, unicode_literals
 from argparse import ArgumentParser
+from configparser import ConfigParser, Error
 import time
 import signal
 import sys
 
-_r = [0.1, 0.1, 0.1]   # Values of the shunt resistors
-_machines = ["pi-1", "pi-2", "pi-3"]
+
+class HexConfigParser(ConfigParser):
+
+    def __init__(self, **kwargs):
+        super(ConfigParser, self).__init__(**kwargs)
+
+    def gethex(self, section, option):
+        return int(self.get(section, option), 16)
+
 
 try:
     from ADCPi import ADCPi
     from ADCDifferentialPi import ADCDifferentialPi
 except ImportError:
-    print("Failed to import ADCPi from python system path")
+    print("Failed to import ADCPi library from python system path")
     print("Importing from parent folder instead")
     try:
-        import sys
         sys.path.append('..')
         from ADCPi import ADCPi
         from ADCDifferentialPi import ADCDifferentialPi
     except ImportError:
         raise ImportError(
-            "Failed to import library from parent folder")
+            "Failed to import teh ADC library from parent folder")
+
 
 def parse_options():
     """Parse the command line options for the measurement application"""
     parser = ArgumentParser(description='Measures the power drawn by USB ports.')
-    parser.add_argument('--frequency', dest='frequency', type=int, default=200,
-                        help='the measurement frequency in milliseconds')
+
+    parser.add_argument('--config', dest='config', type=str, required=True,
+                        help='the path to the configuration file')
 
     parser.add_argument('--output', dest='output', type=str, required=True,
                         help='the path to the output file')
@@ -44,48 +52,77 @@ def parse_options():
     args = parser.parse_args()
     return args
 
-def measure(interval, out_file):
-    '''
-    Main program function
-    '''
 
-    # Differential ADC measuring the voltage drop across shunt resistors
-    adc_diff = ADCDifferentialPi(0x68, 0x69, 16)
-    adc_diff.set_conversion_mode(1)
-    adc_diff.set_pga(1)
+def measure(config, out_file):
+    """
+    Main program function
+    """
+    # Measurement frequency in milliseconds
+    interval = config.getfloat("DEFAULT", "frequency") / 1000
+
+    section = "ADC"
+    address1 = config.gethex(section, "address1")
+    address2 = config.gethex(section, "address2")
+    bit_rate = config.getint(section, "bit_rate")
+    ref_channel = config.getint(section, "ref_channel")
+    conversion_mode = config.getint(section, "conversion_mode")
+    pga = config.getint(section, "pga")
 
     # ADC measuring the value of the input voltage
-    adc_in = ADCPi(0x6A, 0x6B, 16)
-    adc_in.set_conversion_mode(1)
-    adc_in.set_pga(1)
+    adc_in = ADCPi(address1, address2, bit_rate)
+    adc_in.set_conversion_mode(conversion_mode)
+    adc_in.set_pga(pga)
+
+    section = "ADC_DIFF"
+    address1 = config.gethex(section, "address1")
+    address2 = config.gethex(section, "address2")
+    bit_rate = config.getint(section, "bit_rate")
+    conversion_mode = config.getint(section, "conversion_mode")
+    pga = config.getint(section, "pga")
+
+    # Differential ADC measuring the voltage drop across shunt resistors
+    adc_diff = ADCDifferentialPi(address1, address2, bit_rate)
+    adc_diff.set_conversion_mode(conversion_mode)
+    adc_diff.set_pga(pga)
+
+    section = "DEVICES"
+    devices = config.get(section, "ids").split(",")
+    resistors = [float(x) for x in config.get(section, "resistors").split(",")]
+    channels = [int(x) for x in config.get(section, "channels").split(",")]
 
     out = open(out_file, 'w')
-    out.write("timestamp " + (len(_machines) * "%s " % tuple(_machines)) + "\n")
+    out.write("timestamp " + (len(devices) * "%s " % tuple(devices)) + "\n")
     try:
         while True:
-           in_volt = adc_in.read_voltage(1) # No need to measure every input
-           power = []
+            in_volt = adc_in.read_voltage(ref_channel)
+            power = []
 
-           # irst measure and then compute the power
-           for i in range(len(_machines)):
-              power.append((adc_diff.read_voltage(i + 1) * in_volt) / _r[i])
+            # First measure and then compute the power
+            for i in range(len(devices)):
+                power.append((adc_diff.read_voltage(channels[i]) * in_volt) / resistors[i])
 
-           out.write(((len(_machines) + 1) * "%f " + "\n") % ((time.time(), ) + tuple(power)))
-           time.sleep(interval)
+            out.write(((len(devices) + 1) * "%f " + "\n") % ((time.time(),) + tuple(power)))
+            time.sleep(interval)
     finally:
-       out.close()
+        out.close()
 
 
 def signal_handler(signal, frame):
-   print('Stopping...')
-   sys.exit(0)
+    print('Stopping...')
+    sys.exit(0)
 
 
 def main():
-   opts = parse_options()
-   signal.signal(signal.SIGINT, signal_handler)
-   print("Measuring... (Press Ctrl+C to stop)")
-   measure(opts.frequency / 1000.0, opts.output)
+    opts = parse_options()
+    try:
+        config = HexConfigParser()
+        config.read(opts.config)
+    except Error:
+        raise ImportError("Failed to read the configuration file")
+
+    signal.signal(signal.SIGINT, signal_handler)
+    print("Measuring... (Press Ctrl+C to stop)")
+    measure(config, opts.output)
 
 
 if __name__ == "__main__":

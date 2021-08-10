@@ -14,7 +14,7 @@
    viewBox="0 0 559.40934 373.86578"
    id="svg2"
    version="1.1"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
    sodipodi:docname="meter_scheme.svg"
    inkscape:export-filename="/home/marcosda/Code/pi-powermeter/doc/meter_scheme.png"
    inkscape:export-xdpi="121"
@@ -29,21 +29,21 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4"
-     inkscape:cx="149.8421"
-     inkscape:cy="217.09308"
+     inkscape:cx="636.95132"
+     inkscape:cy="160.59233"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1861"
-     inkscape:window-height="1052"
-     inkscape:window-x="1979"
-     inkscape:window-y="0"
+     inkscape:window-width="3368"
+     inkscape:window-height="1376"
+     inkscape:window-x="1992"
+     inkscape:window-y="27"
      inkscape:window-maximized="1"
      fit-margin-top="0"
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     showguides="true" />
+     showguides="false" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -61,6 +61,13 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(359.25385,45.6031)">
+    <rect
+       id="rect3775"
+       width="563.54968"
+       height="377.62329"
+       x="-362.09491"
+       y="-48.004646"
+       style="fill:#ffffff;stroke-width:0.93716526" />
     <rect
        style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.66247314;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect4193"
@@ -345,7 +352,7 @@
        sodipodi:nodetypes="cccc" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.24699998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m -79.475116,204.82073 16.97512,-0.0415 v -22.41707"
+       d="m -188.60132,216.85614 126.355699,-0.27825 -0.236755,-34.2548"
        id="path4349"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccc" />
